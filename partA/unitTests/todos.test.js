@@ -305,6 +305,230 @@ testCases = [
         expect(getTodo.body.todos[0].tasksof).toBeInstanceOf(Array);
         expect(getTodo.body.todos[0].tasksof[0].id).toBe(`${projectPost.body.id}`);
     }],
+
+    // fails due to a bug where it creates a new project for the todo
+    // this behaviour was undocumented so it might be intended but it was never mentioned
+    ['post /todos/:id/tasksof - should return 400 for existing todo id and no project id in the body', async () => {
+        // created a todo to use in the test
+        const todoPost = await ((request(baseUrl).post('/todos')).send({
+            title : "example",
+        }));
+        expect(todoPost.status).toBe(201);
+
+        const res = await (request(baseUrl).post(`/todos/${todoPost.body.id}/tasksof`));
+        // created the relationship
+        expect(res.status).toBe(400);
+    }],
+
+    ['post /todos/:id/tasksof - should return 404 for negative todo id and a valid body', async () => {
+        // created a project to use in the test
+        const projectPost = await (request(baseUrl).post('/projects'));
+        expect(projectPost.status).toBe(201);
+
+        const res = await (request(baseUrl).post(`/todos/-1/tasksof`).send({ "id" : projectPost.body.id }));
+        // created the relationship
+        expect(res.status).toBe(404);
+    }],
+
+    ['post /todos/:id/tasksof - should return 404 for existing todo id and a non-existent project id in req body', async () => {
+        // created a project to use in the test
+        const todoPost = await ((request(baseUrl).post('/todos')).send({
+            title : "example",
+        }));
+        expect(todoPost.status).toBe(201);
+
+        const res = await (request(baseUrl).post(`/todos/${todoPost.body.id}/tasksof`).send({ "id" : -1 }));
+        // created the relationship
+        expect(res.status).toBe(404);
+    }],
+
+    ['post /todos/:id/tasksof - should return 404 for existing todo id and a non-existent project id in req body', async () => {
+        // created a project to use in the test
+        const todoPost = await ((request(baseUrl).post('/todos')).send({
+            title : "example",
+        }));
+        expect(todoPost.status).toBe(201);
+
+        const res = await (request(baseUrl).post(`/todos/${todoPost.body.id}/tasksof`).send({ "id" : -1 }));
+        // created the relationship
+        expect(res.status).toBe(404);
+    }],
+
+    ['DELETE /todos/:id/tasksof/:id - should return 200 for valid ids and existing relation', async () => {
+        // Create a project to use in the test
+        const projectPost = await (request(baseUrl).post('/projects'));
+        expect(projectPost.status).toBe(201);
+    
+        // Create a todo to use in the test
+        const todoPost = await ((request(baseUrl).post('/todos')).send({
+            title : "example",
+            tasksof : [{ id : `${projectPost.body.id}`}]
+        }));
+        expect(todoPost.status).toBe(201);
+    
+        // Delete the tasksof relation
+        const res = await (request(baseUrl).delete(`/todos/${todoPost.body.id}/tasksof/${projectPost.body.id}`));
+        expect(res.status).toBe(200);
+    
+        // Verify the relationship is removed
+        const getTodo = await (request(baseUrl).get(`/todos/${todoPost.body.id}`));
+        expect(getTodo.status).toBe(200);
+        expect(getTodo.body.todos[0].tasksof).toStrictEqual(undefined);
+    }],
+    
+    
+    ['DELETE /todos/:id/tasksof/:id - should return 404 for valid ids but no relation exists', async () => {
+        // Create a project to use in the test
+        const projectPost = await (request(baseUrl).post('/projects'));
+        expect(projectPost.status).toBe(201);
+    
+        // Create a todo to use in the test
+        const todoPost = await ((request(baseUrl).post('/todos')).send({
+            title : "example"
+        }));
+        expect(todoPost.status).toBe(201);
+    
+        // Try to delete the tasksof relation when none exists
+        const res = await (request(baseUrl).delete(`/todos/${todoPost.body.id}/tasksof/${projectPost.body.id}`));
+        expect(res.status).toBe(404);
+    }],
+    
+    
+    ['DELETE /todos/:id/tasksof/:id - should return 404 for todo id exists but tasksof id does not', async () => {
+        // Create a todo to use in the test
+        const todoPost = await ((request(baseUrl).post('/todos')).send({
+            title : "example"
+        }));
+        expect(todoPost.status).toBe(201);
+    
+        // Try to delete a non-existent tasksof relation
+        const res = await (request(baseUrl).delete(`/todos/${todoPost.body.id}/tasksof/${-1}`));
+        expect(res.status).toBe(404);
+    }],
+    
+    
+    ['DELETE /todos/:id/tasksof/:id - should return 404 for tasksof id exists but todo id does not', async () => {
+        // Create a project to use in the test
+        const projectPost = await (request(baseUrl).post('/projects'));
+        expect(projectPost.status).toBe(201);
+    
+        // Try to delete a tasksof relation for a non-existent todo
+        const res = await (request(baseUrl).delete(`/todos/${-1}/tasksof/${projectPost.body.id}`));
+        expect(res.status).toBe(404);
+    }],
+
+    ['GET /todos/:id/categories - should return 200 and categories for valid todo id', async () => {
+        // Create a todo to use in the test
+        const todoPost = await ((request(baseUrl).post('/todos')).send({
+            title : "example"
+        }));
+        expect(todoPost.status).toBe(201);
+    
+        // Create a category and associate it with the todo
+        const categoryPost = await ((request(baseUrl).post(`/todos/${todoPost.body.id}/categories`)).send({
+            title: "Office",
+            description: ""
+        }));
+        expect(categoryPost.status).toBe(201);
+    
+        // Retrieve categories for the created todo
+        const res = await (request(baseUrl).get(`/todos/${todoPost.body.id}/categories`));
+        expect(res.status).toBe(200);
+        expect(res.body).toEqual({
+            categories: [
+                {
+                    id: expect.any(String),  // The id will be dynamically generated
+                    title: "Office",
+                    description: ""
+                }
+            ]
+        });
+    }],
+    
+    // fails due to bug where it doesn't return 404 not found if todo id doesnt exist
+    ['GET /todos/:id/categories - should return 404 for todo id that does not exist', async () => {
+        const res = await (request(baseUrl).get(`/todos/${-1}/categories`));
+        expect(res.status).toBe(404);
+    }],
+
+    ['HEAD /todos/:id/categories - should return 200 and categories for valid todo id', async () => {
+        // Create a todo to use in the test
+        const todoPost = await ((request(baseUrl).post('/todos')).send({
+            title : "example"
+        }));
+        expect(todoPost.status).toBe(201);
+    
+        // Create a category and associate it with the todo
+        const categoryPost = await ((request(baseUrl).post(`/todos/${todoPost.body.id}/categories`)).send({
+            title: "Office",
+            description: ""
+        }));
+        expect(categoryPost.status).toBe(201);
+    
+        // Send HEAD request to check categories for the created todo
+        const res = await (request(baseUrl).head(`/todos/${todoPost.body.id}/categories`));
+        expect(res.status).toBe(200);
+    }],
+    
+    // fails due to an error where it doesn't return 404 when todo is not found
+    ['HEAD /todos/:id/categories - should return 404 for todo id that does not exist', async () => {
+        const res = await (request(baseUrl).head(`/todos/${-1}/categories`));
+        expect(res.status).toBe(404);
+    }],
+
+    ['POST /todos/:id/categories - should return 201 and associate category with todo when both exist', async () => {
+        // Create a todo
+        const todoPost = await (request(baseUrl).post('/todos').send({
+            title: "example todo"
+        }));
+        expect(todoPost.status).toBe(201);
+    
+        // Create a category
+        const categoryPost = await (request(baseUrl).post('/categories').send({
+            title: "Office"
+        }));
+        expect(categoryPost.status).toBe(201);
+    
+        // Associate the category with the todo
+        const res = await (request(baseUrl).post(`/todos/${todoPost.body.id}/categories`).send({
+            id: categoryPost.body.id
+        }));
+        expect(res.status).toBe(201);
+    }],
+    
+    ['POST /todos/:id/categories - should return 404 if todo id does not exist', async () => {
+        const categoryPost = await (request(baseUrl).post('/categories').send({
+            title: "Office"
+        }));
+        expect(categoryPost.status).toBe(201);
+    
+        const res = await (request(baseUrl).post(`/todos/${-1}/categories`).send({
+            id: categoryPost.body.id
+        }));
+        expect(res.status).toBe(404);
+    }],
+    
+    ['POST /todos/:id/categories - should return 404 if category id does not exist', async () => {
+        const todoPost = await (request(baseUrl).post('/todos').send({
+            title: "example todo"
+        }));
+        expect(todoPost.status).toBe(201);
+    
+        const res = await (request(baseUrl).post(`/todos/${todoPost.body.id}/categories`).send({
+            id: -1
+        }));
+        expect(res.status).toBe(404);
+    }],
+    
+    ['POST /todos/:id/categories - should return 400 if request body is missing', async () => {
+        const todoPost = await (request(baseUrl).post('/todos').send({
+            title: "example todo"
+        }));
+        expect(todoPost.status).toBe(201);
+    
+        const res = await (request(baseUrl).post(`/todos/${todoPost.body.id}/categories`));
+        expect(res.status).toBe(400);
+    }],
 ]
 
 // randomize order
