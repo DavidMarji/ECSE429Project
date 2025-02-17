@@ -285,22 +285,25 @@ testCases = [
     }],
 
     ['post /todos/:id/tasksof - should return 200 for existing todo id and should create a tasksof relationship in the todo', async () => {
+        // created a project to use in the test
         const projectPost = await (request(baseUrl).post('/projects'));
         expect(projectPost.status).toBe(201);
 
+        // created a todo to use in the test
         const todoPost = await ((request(baseUrl).post('/todos')).send({
             title : "example",
         }));
         expect(todoPost.status).toBe(201);
 
         const res = await (request(baseUrl).post(`/todos/${todoPost.body.id}/tasksof`).send({ "id" : projectPost.body.id }));
+        // created the relationship
         expect(res.status).toBe(201);
 
+        // get the todo with the id we know
         const getTodo = await (request(baseUrl).get(`/todos/${todoPost.body.id}`));
         expect(getTodo.status).toBe(200);
-
-        expect(getTodo.body.tasksof).toBeInstanceOf(Array);
-        expect(getTodo.body.tasksof[0].id).toBe(`${projectPost.body.id}`);
+        expect(getTodo.body.todos[0].tasksof).toBeInstanceOf(Array);
+        expect(getTodo.body.todos[0].tasksof[0].id).toBe(`${projectPost.body.id}`);
     }],
 ]
 
