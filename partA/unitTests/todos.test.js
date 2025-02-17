@@ -529,6 +529,69 @@ testCases = [
         const res = await (request(baseUrl).post(`/todos/${todoPost.body.id}/categories`));
         expect(res.status).toBe(400);
     }],
+
+    ['DELETE /todos/:id/categories/:id - should return 404 if todo exists but category id does not exist', async () => {
+        // Create a todo
+        const todoPost = await (request(baseUrl).post('/todos').send({
+            title: "example todo"
+        }));
+        expect(todoPost.status).toBe(201);
+    
+        const res = await (request(baseUrl).delete(`/todos/${todoPost.body.id}/categories/${-1}`));
+        expect(res.status).toBe(404);
+    }],
+    
+    ['DELETE /todos/:id/categories/:id - should return 404 if todo and category exist but no relation exists', async () => {
+        // Create a todo
+        const todoPost = await (request(baseUrl).post('/todos').send({
+            title: "example todo"
+        }));
+        expect(todoPost.status).toBe(201);
+    
+        // Create a category
+        const categoryPost = await (request(baseUrl).post('/categories').send({
+            title: "Office"
+        }));
+        expect(categoryPost.status).toBe(201);
+    
+        // Try deleting the non-existing relation between them
+        const res = await (request(baseUrl).delete(`/todos/${todoPost.body.id}/categories/${categoryPost.body.id}`));
+        expect(res.status).toBe(404);
+    }],
+    
+    ['DELETE /todos/:id/categories/:id - should return 200 and delete relation if both todo and category exist and the relation exists', async () => {
+        // Create a todo
+        const todoPost = await (request(baseUrl).post('/todos').send({
+            title: "example todo"
+        }));
+        expect(todoPost.status).toBe(201);
+    
+        // Create a category
+        const categoryPost = await (request(baseUrl).post('/categories').send({
+            title: "Office"
+        }));
+        expect(categoryPost.status).toBe(201);
+    
+        // Create the relation between todo and category
+        await (request(baseUrl).post(`/todos/${todoPost.body.id}/categories`).send({
+            id: categoryPost.body.id
+        }));
+    
+        // Now delete the relation
+        const res = await (request(baseUrl).delete(`/todos/${todoPost.body.id}/categories/${categoryPost.body.id}`));
+        expect(res.status).toBe(200);
+    }],
+    
+    ['DELETE /todos/:id/categories/:id - should return 404 if category id does not exist', async () => {
+        // Create a todo
+        const todoPost = await (request(baseUrl).post('/todos').send({
+            title: "example todo"
+        }));
+        expect(todoPost.status).toBe(201);
+    
+        const res = await (request(baseUrl).delete(`/todos/${todoPost.body.id}/categories/${-1}`));
+        expect(res.status).toBe(404);
+    }],
 ]
 
 // randomize order
