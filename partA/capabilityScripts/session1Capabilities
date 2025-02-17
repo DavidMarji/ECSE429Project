@@ -1,0 +1,82 @@
+#!/bin/bash
+echo "GET all todos with no filter"
+
+curl --location --request GET 'http://localhost:4567/todos'
+
+echo $'\n----------------------------------------------------------------------------------------------------------------------------------------------------------------'
+
+echo "GET all todos with filter on title = Wash Dishes"
+
+curl --location --request GET 'http://localhost:4567/todos?title=Wash+Dishes'
+
+echo $'\n----------------------------------------------------------------------------------------------------------------------------------------------------------------'
+
+echo "POST Todo that has no relation to project or category"
+
+curl --location --request POST 'http://localhost:4567/todos' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "title": "Wash Dishes",
+    "doneStatus": false,
+    "description": "Home Chore to be done"
+}'
+
+echo $'\n----------------------------------------------------------------------------------------------------------------------------------------------------------------'
+
+echo "HEAD All Todos: Return headers of todos"
+
+curl --location --head 'http://localhost:4567/todos'
+
+echo $'\n----------------------------------------------------------------------------------------------------------------------------------------------------------------'
+
+echo "Filter Todos to get all todos not done"
+
+curl --location --request GET 'http://localhost:4567/todos?doneStatus=false'
+
+echo $'\n----------------------------------------------------------------------------------------------------------------------------------------------------------------'
+
+echo "GET Existing Todo"
+
+curl --location --request GET 'http://localhost:4567/todos/1'
+
+echo $'\n----------------------------------------------------------------------------------------------------------------------------------------------------------------'
+
+echo "GET Non-existing Todo"
+
+curl --location --request GET 'http://localhost:4567/todos/40'
+
+echo $'\n----------------------------------------------------------------------------------------------------------------------------------------------------------------'
+
+echo "HEAD Existing Todo: Return header of 1 existing Todo"
+
+curl --location --head 'http://localhost:4567/todos/1'
+
+echo $'\n----------------------------------------------------------------------------------------------------------------------------------------------------------------'
+
+echo "HEAD Non-existing Todo: Return header of 1 non-existing Todo"
+
+curl --location --head 'http://localhost:4567/todos/40'
+
+echo $'\n----------------------------------------------------------------------------------------------------------------------------------------------------------------'
+
+echo "Update Existing Todo using POST endpoint -- Updating non-relational attributes"
+
+curl --location --request POST 'http://localhost:4567/todos/1' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+            "title": "Shred paperwork",
+            "doneStatus": true,
+            "description": "shredding sensitive info",
+            "categories": [
+                {
+                    "id": "1"
+                }
+            ],
+            "tasksof": [
+                {
+                    "id": "1"
+                }
+            ]
+}
+'
+echo $'\n----------------------------------------------------------------------------------------------------------------------------------------------------------------'
