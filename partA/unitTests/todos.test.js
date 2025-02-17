@@ -247,8 +247,7 @@ testCases = [
         expect(res.status).toBe(404);
     }],
 
-    // fails due to bug
-    ['head /todos/:id/tasksof - should return 200 for existing id and should get correct tasksof', async () => {
+    ['head /todos/:id/tasksof - should return 200 for existing id', async () => {
         const projectPost = await (request(baseUrl).post('/projects'));
         expect(projectPost.status).toBe(201);
 
@@ -264,6 +263,45 @@ testCases = [
         expect(res.status).toBe(200);
     }],
 
+    // fails due to bug
+    ['head /todos/:id/tasksof - should return 404 for negative id', async () => {
+        const res = await (request(baseUrl).head(`/todos/-1/tasksof`));
+        expect(res.status).toBe(404);
+    }],
+
+    // fails due to bug
+    ['head /todos/:id/tasksof - should return 404 for non-existent id', async () => {
+        const allTodos = await (request(baseUrl).get(`/todos`));
+        expect(allTodos.status).toBe(200);
+
+        // delete all todos and try to get a to do with id 23
+        for(let i = 0; i < allTodos.body.todos.length; i++) {
+            await request(baseUrl).delete(`/todos/${allTodos.body.todos[i].id}`)
+        }
+
+        const res = await (request(baseUrl).head(`/todos/123/tasksof`));
+
+        expect(res.status).toBe(404);
+    }],
+
+    ['post /todos/:id/tasksof - should return 200 for existing todo id and should create a tasksof relationship in the todo', async () => {
+        const projectPost = await (request(baseUrl).post('/projects'));
+        expect(projectPost.status).toBe(201);
+
+        const todoPost = await ((request(baseUrl).post('/todos')).send({
+            title : "example",
+        }));
+        expect(todoPost.status).toBe(201);
+
+        const res = await (request(baseUrl).post(`/todos/${todoPost.body.id}/tasksof`).send({ "id" : projectPost.body.id }));
+        expect(res.status).toBe(201);
+
+        const getTodo = await (request(baseUrl).get(`/todos/${todoPost.body.id}`));
+        expect(getTodo.status).toBe(200);
+
+        expect(getTodo.body.tasksof).toBeInstanceOf(Array);
+        expect(getTodo.body.tasksof[0].id).toBe(`${projectPost.body.id}`);
+    }],
 ]
 
 // randomize order
