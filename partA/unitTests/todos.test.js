@@ -70,9 +70,23 @@ testCases = [
         }
     }],
 
-    ['get /todos/:id - should return 404 for non-existent id -1', async () => {
+    ['get /todos/:id - should return 404 for negative id', async () => {
 
         const res= await (request(baseUrl).get(`/todos/${-1}`));
+        expect(res.status).toBe(404);
+    }],
+
+    ['get /todos/:id - should return 404 for non-existent id', async () => {
+
+        const allTodos = await (request(baseUrl).get(`/todos`));
+        expect(allTodos.status).toBe(200);
+
+        // delete all todos and try to get a to do with id 23
+        for(let i = 0; i < allTodos.body.todos.length; i++) {
+            await request(baseUrl).delete(`/todos/${allTodos.body.todos[i].id}`)
+        }
+
+        const res= await (request(baseUrl).get(`/todos/${23}`));
         expect(res.status).toBe(404);
     }],
     
@@ -90,8 +104,21 @@ testCases = [
         }
     }],
 
+    ['head /todos/:id - should return 404 for negative id', async () => {
+        const res= await (request(baseUrl).head(`/todos/-1`));
+        expect(res.status).toBe(404);
+    }],
+
     ['head /todos/:id - should return 404 for non-existent id', async () => {
-        const res= await (request(baseUrl).head(`/todos/${-1}`));
+        const allTodos = await (request(baseUrl).get(`/todos`));
+        expect(allTodos.status).toBe(200);
+
+        // delete all todos and try to get a to do with id 23
+        for(let i = 0; i < allTodos.body.todos.length; i++) {
+            await request(baseUrl).delete(`/todos/${allTodos.body.todos[i].id}`)
+        }
+
+        const res= await (request(baseUrl).head(`/todos/${23}`));
         expect(res.status).toBe(404);
     }],
 
@@ -106,6 +133,19 @@ testCases = [
         expect(resUpdated.status).toBe(200);
 
         expect(resUpdated.body).toStrictEqual(res.body);
+    }],
+
+    ['post /todos/:id - should return 404 for non-existent id', async () => {
+        const allTodos = await (request(baseUrl).get(`/todos`));
+        expect(allTodos.status).toBe(200);
+
+        // delete all todos and try to get a to do with id 23
+        for(let i = 0; i < allTodos.body.todos.length; i++) {
+            await request(baseUrl).delete(`/todos/${allTodos.body.todos[i].id}`)
+        }
+
+        const res = await (request(baseUrl).post('/todos/').send({title : "newTitle", doneStatus : true }));
+        expect(res.status).toBe(404)
     }],
 
     ['post /todos/:id - should return 404 for id -1', async () => {
@@ -125,6 +165,20 @@ testCases = [
 
         expect(resUpdated.body.todos[0]).toStrictEqual(res.body);
     }],
+
+    ['put /todos/:id - should return 404 for non-existent id', async () => {
+        const allTodos = await (request(baseUrl).get(`/todos`));
+        expect(allTodos.status).toBe(200);
+
+        // delete all todos and try to get a to do with id 23
+        for(let i = 0; i < allTodos.body.todos.length; i++) {
+            await request(baseUrl).delete(`/todos/${allTodos.body.todos[i].id}`)
+        }
+
+        const res = await (request(baseUrl).put('/todos/1').send({title : "newTitle", doneStatus : true }));
+        expect(res.status).toBe(404)
+    }],
+        
 
     ['put /todos/:id - should return 404 for id -1', async () => {
         const res = await (request(baseUrl).put('/todos/-1').send({title : "newTitle", doneStatus : true }));
@@ -147,9 +201,69 @@ testCases = [
         expect(getRes.status).toBe(404);
     }],
 
-    // ['get /todos/:id/tasksof - should return 200 for existing id and should get correct tasksof', async () => {
-        
-    // }],
+    ['get /todos/:id/tasksof - should return 200 for existing id and should get correct tasksof', async () => {
+        const projectPost = await (request(baseUrl).post('/projects'));
+        expect(projectPost.status).toBe(201);
+
+        const todoPost = await ((request(baseUrl).post('/todos')).send({
+            title : "example",
+            tasksof : [ { id : `${projectPost.body.id}`} ]
+        }));
+        expect(todoPost.status).toBe(201);
+        expect(todoPost.body.tasksof).toBeInstanceOf(Array);
+
+        const res = await (request(baseUrl).get(`/todos/${todoPost.body.id}/tasksof`));
+
+        expect(res.status).toBe(200);
+        expect(res.body.projects).toBeInstanceOf(Array);
+        expect(res.body.projects[0].id).toStrictEqual(todoPost.body.tasksof[0].id);
+    }],
+
+    // fails due to bug
+    ['get /todos/:id/tasksof - should return 404 for non-existent todo id', async () => {
+        const allTodos = await (request(baseUrl).get(`/todos`));
+        expect(allTodos.status).toBe(200);
+
+        // delete all todos and try to get a to do with id 23
+        for(let i = 0; i < allTodos.body.todos.length; i++) {
+            await request(baseUrl).delete(`/todos/${allTodos.body.todos[i].id}`)
+        }
+
+        const res = await (request(baseUrl).get(`/todos/23/tasksof`));
+        expect(res.status).toBe(404);
+    }],
+
+    // fails due to bug
+    ['get /todos/:id/tasksof - should return 404 for negative todo id', async () => {
+        const allTodos = await (request(baseUrl).get(`/todos`));
+        expect(allTodos.status).toBe(200);
+
+        // delete all todos and try to get a to do with id 23
+        for(let i = 0; i < allTodos.body.todos.length; i++) {
+            await request(baseUrl).delete(`/todos/${allTodos.body.todos[i].id}`)
+        }
+
+        const res = await (request(baseUrl).get(`/todos/-1/tasksof`));
+        expect(res.status).toBe(404);
+    }],
+
+    // fails due to bug
+    ['head /todos/:id/tasksof - should return 200 for existing id and should get correct tasksof', async () => {
+        const projectPost = await (request(baseUrl).post('/projects'));
+        expect(projectPost.status).toBe(201);
+
+        const todoPost = await ((request(baseUrl).post('/todos')).send({
+            title : "example",
+            tasksof : [ { id : `${projectPost.body.id}`} ]
+        }));
+        expect(todoPost.status).toBe(201);
+        expect(todoPost.body.tasksof).toBeInstanceOf(Array);
+
+        const res = await (request(baseUrl).head(`/todos/${todoPost.body.id}/tasksof`));
+
+        expect(res.status).toBe(200);
+    }],
+
 ]
 
 // randomize order
