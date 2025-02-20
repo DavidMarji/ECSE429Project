@@ -152,12 +152,41 @@ testCases = [
         const res = await (request(baseUrl).post('/todos/-1').send({title : "newTitle", doneStatus : true }));
         expect(res.status).toBe(404)
     }],
+
+    // here it passes but with put it doesn't. So they work differently and this was undocumented
+    ['post /todos/:id - should return 200 and update todo with the given id without title in body', async () => {
+        const resPost = await (request(baseUrl).post('/todos').send({ title : "example", doneStatus : false}));
+        expect(resPost.status).toBe(201)
+
+        const res = await (request(baseUrl).post(`/todos/${resPost.body.id}`).send({ doneStatus : true }));
+        expect(res.status).toBe(200);
+
+        const resUpdated = await (request(baseUrl).get(`/todos/${resPost.body.id}`));
+        expect(resUpdated.status).toBe(200);
+
+        expect(resUpdated.body.todos[0]).toStrictEqual(res.body);
+    }],
     
     ['put /todos/:id - should return 200 and update todo with the given id', async () => {
         const resPost = await (request(baseUrl).post('/todos').send({ title : "example", doneStatus : false}));
         expect(resPost.status).toBe(201)
 
         const res = await (request(baseUrl).put(`/todos/${resPost.body.id}`).send({ title : "newTitle", doneStatus : true }));
+        expect(res.status).toBe(200);
+
+        const resUpdated = await (request(baseUrl).get(`/todos/${resPost.body.id}`));
+        expect(resUpdated.status).toBe(200);
+
+        expect(resUpdated.body.todos[0]).toStrictEqual(res.body);
+    }],
+
+    // bug
+    // undocumented that put must have title when post doesn't need it
+    ['put /todos/:id - should return 200 and update todo with the given id without title in body', async () => {
+        const resPost = await (request(baseUrl).post('/todos').send({ title : "example", doneStatus : false}));
+        expect(resPost.status).toBe(201)
+
+        const res = await (request(baseUrl).put(`/todos/${resPost.body.id}`).send({ doneStatus : true }));
         expect(res.status).toBe(200);
 
         const resUpdated = await (request(baseUrl).get(`/todos/${resPost.body.id}`));
