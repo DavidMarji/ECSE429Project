@@ -6,8 +6,7 @@ const checkServer = async () => {
         await request(baseUrl).get('/projects');
         return true;
     } catch (error) {
-        console.error('Backend is not running. Please start the server.');
-        process.exit(1);
+        throw new Error('Backend is not running. Please start the server.');
     }
 };
 
@@ -19,7 +18,7 @@ const testCases = [
     }],
 
     ['GET /projects?active=false - should return all projects with active=false', async () => {
-        const res = await request(baseUrl).get('/projects?active=falgse');
+        const res = await request(baseUrl).get('/projects?active=false');
         expect(res.status).toBe(200);
         expect(res.body.projects).toBeInstanceOf(Array);
         for(let i = 0; i < res.body.projects.length; i++) {
@@ -256,6 +255,9 @@ const testCases = [
         expect(checkRes.body.todos.some(todo => todo.id === todoRes.body.id)).toBe(false);
     }]
 ];
+
+// randomize order
+testCases.sort(() => Math.random() - 0.5);
 
 describe('Projects API Tests', () => {
     beforeAll(async () => {
