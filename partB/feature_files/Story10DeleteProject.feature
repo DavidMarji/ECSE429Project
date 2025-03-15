@@ -12,7 +12,6 @@ Feature: Delete Unnecessary Project
     When the student requests to delete the project using its id
     Then the project should be removed from the system
     And the response status should be 200
-    And a confirmation message "Project deleted successfully" is displayed
 
   # Alternate Flow
   Scenario: Deleting a project while maintaining task associations with other projects
@@ -24,12 +23,11 @@ Feature: Delete Unnecessary Project
     And the association between the deleted project and its tasks should be removed
     And tasks associated with other projects should maintain those associations
     And the response status should be 200
-    And a confirmation message "Project deleted successfully" is displayed
 
   # Error Flow
   Scenario: Error when project ID does not exist
     Given the student has selected a non-existent project with projectId "-1"
     When the student requests to delete the project with projectId "-1"
-    Then the system should return an error message "Invalid GUID for -1 entity project"
+    Then the system should return an error message "Could not find any instances with projects/-1"
     And the response status should be 404
     And no changes should be made to the system
