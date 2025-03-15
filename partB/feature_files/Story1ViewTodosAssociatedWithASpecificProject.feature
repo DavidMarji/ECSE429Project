@@ -4,7 +4,8 @@ Feature: View Todos Associated with a Specific Project
   So that I can track my remaining tasks and manage my workload effectively.
 
   Background:
-    Given A valid project exists which has valid todos associated with it
+    Given The server is running
+    And A valid project exists which has valid todos associated with it
 
   # Normal Flow
   Scenario: Successfully viewing todos for a specific project
