@@ -1,4 +1,4 @@
-Feature: Update Todo Details with Post
+Feature: Update Todo Details with P
   As a student,
   I want to update the details of a todo so that it accurately reflects the current status and requirements of the task.
 

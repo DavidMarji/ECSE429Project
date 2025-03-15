@@ -2,19 +2,22 @@ Feature: Delete a Completed Todo
   As a student,
   I want to delete a completed todo so that I can keep my task list organized and focus only on pending work.
 
+  Background:
+    Given the server is running
+
   # Normal Flow
   Scenario: Successfully deleting a completed todo
-    Given the server is running
     And a valid todo exists with doneStatus True
     When the student requests to delete the completed todo
     Then the system should delete the todo
     And the response status should be 200
 
   # Alternate Flow
-   Scenario: Successfully deleting a pending todo (accidental creation)
-    Given a todo is marked as pending (doneStatus = false)
+  Scenario: Successfully deleting a todo assigned to a project
+    Given a todo is marked is assigned to a project
     When the student requests to delete the todo
     Then the system should delete the todo
+    And the projects tasks list should no longer include the todo's id
     And the response status should be 200
 
   # Error Flow

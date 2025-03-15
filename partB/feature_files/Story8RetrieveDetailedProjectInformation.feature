@@ -4,6 +4,7 @@ Feature: Retrieve Detailed Project Information
   So that I can understand its objectives, deadlines, and associated tasks.
 
   Background:
+    Given the server is running
     Given Multiple projects exist in the system with varying details and associated tasks
 
   # Normal Flow

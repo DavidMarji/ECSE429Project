@@ -4,6 +4,7 @@ Feature: Update Project Status
   So that I can track my accomplishments and focus on remaining work.
 
   Background:
+    Given the server is running
     Given A valid project exists in the system
 
   # Normal Flow

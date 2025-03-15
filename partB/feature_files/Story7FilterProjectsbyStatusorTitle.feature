@@ -4,6 +4,7 @@ Feature: Filter Projects by Status or Title
   So that I can quickly find relevant projects.
 
   Background:
+    Given the server is running
     Given Multiple projects exist in the system with varying statuses and titles
 
   # Normal Flow
