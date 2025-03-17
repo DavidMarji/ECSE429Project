@@ -8,14 +8,14 @@ Feature: Retrieve Detailed Project Information
     Given Multiple projects exist in the system with varying details and associated tasks
 
   # Normal Flow
-  Scenario: Successfully retrieving detailed information for a specific project
+  Scenario: Successfully retrieving detailed information for a specific project (Normal Flow)
     When the student requests detailed information for a valid project using its id
     Then the system should return complete project details including title, description, status
     And the response status should be 200
     And the associated tasks for the project should be included in the response
 
   # Alternate Flow
-  Scenario: Retrieving project information with no associated tasks
+  Scenario: Retrieving project information with no associated tasks (Alternate Flow)
     Given A valid project exists which has no tasks assigned
     When the student requests detailed information for this project
     Then the system should return the project details
@@ -23,7 +23,7 @@ Feature: Retrieve Detailed Project Information
     And the response status should be 200
 
   # Error Flow
-  Scenario: Error when project ID does not exist
+  Scenario: Error when project ID does not exist (Error Flow)
     Given the student has selected a non-existent project with projectId "-1"
     When the student requests detailed information for projectId "-1"
     Then the system should return an error message "Could not find an instance with projects/-1"

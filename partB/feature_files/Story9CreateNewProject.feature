@@ -7,7 +7,7 @@ Feature: Create New Project
     Given The system is running and the student has access to create projects
 
   # Normal Flow
-  Scenario: Successfully creating a new project with all required details
+  Scenario: Successfully creating a new project with all required details (Normal Flow)
     When the student creates a new project with the following details:
       | title                | description                              | active | completed
       | "Group Assignment 1" | "Research paper on renewable energy"     | true   | false
@@ -16,7 +16,7 @@ Feature: Create New Project
 
 
   # Alternate Flow
-  Scenario: Creating a new project with minimal required details
+  Scenario: Creating a new project with minimal required details (Alternate Flow)
     When the student creates a new project with only the required title:
       | title                |
       | "Individual Project" |
@@ -25,7 +25,7 @@ Feature: Create New Project
     And the system should return the newly created project details including an assigned id
 
   # Error Flow
-  Scenario: Error when creating a project with id in request body
+  Scenario: Error when creating a project with id in request body (Error Flow)
     When the student attempts to create a new project with id in request body
     Then the system should return an error message "Invalid Creation: Failed Validation: Not allowed to create with id"
     And the response status should be 400
