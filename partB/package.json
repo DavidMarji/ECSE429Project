@@ -1,0 +1,19 @@
+{
+  "name": "part_b",
+  "version": "1.0.0",
+  "description": "part b of the assignment",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DavidMarji/ECSE429Project.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DavidMarji/ECSE429Project/issues"
+  },
+  "homepage": "https://github.com/DavidMarji/ECSE429Project#readme"
+}

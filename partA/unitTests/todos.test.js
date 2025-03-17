@@ -5,8 +5,7 @@ const checkServer = async () => {
         await request(baseUrl).get('/todos');
         return true;
     } catch (error) {
-        console.error('Backend is not running. Please start the server.');
-        process.exit(1);
+        throw new Error('Backend is not running. Please start the server.');
     }
 };
 
