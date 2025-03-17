@@ -104,14 +104,12 @@ When('the student attempts to update the project with projectId {string} to set 
     }
 });
 
-Then('the system should return an error message {string}', function(expectedMessage) {
+Then('the system should return this {string}', function(expectedMessage) {
   assert.strictEqual(errorMessage, expectedMessage);
 });
 Then
 
-// Clean up after tests
 Then('the project should be deleted', async function() {
-  // Only try to delete if we have a valid project ID
   if (projectId && projectId !== "-1") {
     await request(baseUrl).delete(`/projects/${projectId}`);
   }
