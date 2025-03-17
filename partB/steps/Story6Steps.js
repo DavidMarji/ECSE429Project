@@ -10,11 +10,6 @@ let validProject;
 let returnCode;
 let errorMessage;
 
-// Background Steps
-Given('the server is running', async function() {
-  await request(baseUrl).get('/projects');
-});
-
 Given('A valid project exists in the system', async function() {
 
   const res = await request(baseUrl).post('/projects').send({

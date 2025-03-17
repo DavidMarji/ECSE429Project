@@ -101,6 +101,7 @@ Then('the list should display details for each todo \\(e.g., title, description,
 })
 
 Then('the response status should be 200', async () => {
+    console.log("this is ", resSaved);
     assert.strictEqual(resSaved.status, 200);
 });
 
