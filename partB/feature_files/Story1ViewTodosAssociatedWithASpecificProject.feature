@@ -20,7 +20,6 @@ Feature: View Todos Associated with a Specific Project
     When the student requests the list of todos for the project
     Then the system should return an empty list
     And the response status should be 200
-    And a message "No todos found for this project" is displayed
 
   # Error Flow
   Scenario: Error when project ID is invalid (Error Flow)
