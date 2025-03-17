@@ -8,7 +8,7 @@ Feature: View Todos Associated with a Specific Project
     And A valid project exists which has valid todos associated with it
 
   # Normal Flow
-  Scenario: Successfully viewing todos for a specific project
+  Scenario: Successfully viewing todos for a specific project (Normal Flow)
     When the student requests the list of todos for the valid project using its id
     Then the system should return a list of todos associated with the project
     And the list should display details for each todo (e.g., title, description, due date)
@@ -16,14 +16,14 @@ Feature: View Todos Associated with a Specific Project
 
   # Alternate Flow
   Scenario: Viewing todos for a project with no associated todos
-    Given A valid project exists which has no todos assigned
+    Given A valid project exists which has no todos assigned (Alternate Flow)
     When the student requests the list of todos for the project
     Then the system should return an empty list
     And the response status should be 200
     And a message "No todos found for this project" is displayed
 
   # Error Flow
-  Scenario: Error when project ID is invalid
+  Scenario: Error when project ID is invalid (Error Flow)
     Given the student has selected an invalid project with projectId "-1"
     When the student requests the list of todos for projectId "-1"
     Then the system should return an error message "Could not find an instance with projects/-1"

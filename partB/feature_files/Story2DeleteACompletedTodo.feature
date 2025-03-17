@@ -6,14 +6,14 @@ Feature: Delete a Completed Todo
     Given the server is running
 
   # Normal Flow
-  Scenario: Successfully deleting a completed todo
+  Scenario: Successfully deleting a completed todo (Normal Flow)
     And a valid todo exists with doneStatus True
     When the student requests to delete the completed todo
     Then the system should delete the todo
     And the response status should be 200
 
   # Alternate Flow
-  Scenario: Successfully deleting a todo assigned to a project
+  Scenario: Successfully deleting a todo assigned to a project (Alternate Flow)
     Given a todo is marked is assigned to a project
     When the student requests to delete the todo
     Then the system should delete the todo
@@ -21,7 +21,7 @@ Feature: Delete a Completed Todo
     And the response status should be 200
 
   # Error Flow
-  Scenario: Error when trying to delete a non-existent todo
+  Scenario: Error when trying to delete a non-existent todo (Error Flow)
     Given the student has specified a non-existent todo id "-1"
     When the student requests to delete the todo with id "-1"
     Then the system should return an error message "Could not find any instances with todos/2"
