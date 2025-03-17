@@ -8,7 +8,6 @@ let response;
 let returnCode;
 let projects = [];
 
-// Background Step
 Given('Multiple projects exist in the system with varying statuses and titles', async function() {
   const projectData = [
     { title: "Math Assignment", completed: false, active: true },
@@ -17,7 +16,6 @@ Given('Multiple projects exist in the system with varying statuses and titles', 
     { title: "History Essay", completed: true, active: true }
   ];
 
-  // Store created project IDs for cleanup later
   projects = [];
 
   for (const data of projectData) {
@@ -27,7 +25,6 @@ Given('Multiple projects exist in the system with varying statuses and titles', 
   }
 });
 
-// Normal Flow - Filter by Active Status
 When('the student requests to filter projects with active status {string}', async function(activeStatus) {
   response = await request(baseUrl)
     .get(`/projects?active=${activeStatus}`);
@@ -57,7 +54,6 @@ Then('all returned projects should have active status {string}', function(expect
   }
 });
 
-// Alternate Flow - Filter by Title
 When('the student requests to filter projects with title containing {string}', async function(titleSubstring) {
   response = await request(baseUrl)
     .get(`/projects?title=${titleSubstring}`);
