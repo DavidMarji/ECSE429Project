@@ -4,7 +4,7 @@
   "description": "part b of the assignment",
   "main": "index.js",
   "scripts": {
-    "test": "cucumber-js ./feature_files/Story1ViewTodosAssociatedWithASpecificProject.feature -r ./steps --order random:36987"
+    "test": "cucumber-js ./complete/Story2DeleteACompletedTodo.feature -r ./steps --order random:36987"
   },
   "repository": {
     "type": "git",

@@ -25,5 +25,5 @@ Feature: View Todos Associated with a Specific Project
   Scenario: Error when project ID is invalid (Error Flow)
     Given the student has selected an invalid project with projectId "-1"
     When the student requests the list of todos for projectId "-1"
-    Then the system should return an error message "Could not find an instance with projects/-1"
+    Then the system should return an error message about the project id being not found "Could not find an instance with projects/-1"
     And the response status should be 404

@@ -20,7 +20,7 @@ After(async () => {
     await request(baseUrl).delete(`/todos/${todo2?.id}`);
     await request(baseUrl).delete(`/projects/${project1?.id}`);
     await request(baseUrl).delete(`/projects/${project2?.id}`);
-    
+
     project1 = undefined;
     project2 = undefined;
     todo1 = undefined;
@@ -123,7 +123,6 @@ Then('the system should return an empty list', () => {
 });
 
 Given('the student has selected an invalid project with projectId \"-1\"', () => {
-    console.log("starting error flow");
 });
 
 Given('the student requests the list of todos for projectId \"-1\"', async () => {
@@ -132,13 +131,9 @@ Given('the student requests the list of todos for projectId \"-1\"', async () =>
     assert.notStrictEqual(res, null);
 
     resSaved = res;
-
-    console.log("requested projectid -1");
-
-    console.log(res.body);
 });
 
-Then('the system should return an error message {string}', function (string){
+Then('the system should return an error message about the project id being not found {string}', function (string){
     assert.strictEqual(resSaved.body.errorMessages[0], string);
 });
 
