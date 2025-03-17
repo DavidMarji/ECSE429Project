@@ -101,7 +101,6 @@ Then('the list should display details for each todo \\(e.g., title, description,
 })
 
 Then('the response status should be 200', async () => {
-    console.log("this is ", resSaved);
     assert.strictEqual(resSaved.status, 200);
 });
 
@@ -141,6 +140,4 @@ Then('the system should return an error message about the project id being not f
 // undocumented behaviour where it prints all todos in the system even if the project doesnt exist (id = -1)
 Then('the response status should be 404', () => {
     assert.strictEqual(resSaved.status, 404);
-
-    resSaved = undefined;
 });

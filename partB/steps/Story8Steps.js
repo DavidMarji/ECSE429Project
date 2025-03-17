@@ -95,7 +95,6 @@ Then('the response status needs to include {int}', function(expectedStatus) {
   assert.strictEqual(returnCode, expectedStatus);
 });
 Then('the associated tasks for the project should be included in the response', function() {
-  console.log(response.tasks.todos)
   assert(response.tasks.todos.length > 0, 'No tasks found in response');
 
   response.tasks.todos.forEach(task => {
@@ -151,7 +150,7 @@ When('the student requests detailed information for projectId {string}', async f
   }
 });
 
-Then('the system should return  error message {string}', function(expectedMessage) {
+Then('the system should return an error message {string}', function(expectedMessage) {
   assert(errorMessage, 'No error message returned');
   assert.strictEqual(errorMessage, expectedMessage);
 });

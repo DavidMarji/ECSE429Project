@@ -27,4 +27,4 @@ Feature: Retrieve Detailed Project Information
     Given the student has selected a non-existent project with projectId "-1"
     When the student requests detailed information for projectId "-1"
     Then the system should return an error message "Could not find an instance with projects/-1"
-    And the response status should be 404
+    And the response status should include 404
