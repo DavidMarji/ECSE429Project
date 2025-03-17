@@ -15,8 +15,8 @@ Feature: View Todos Associated with a Specific Project
     And the response status should be 200
 
   # Alternate Flow
-  Scenario: Viewing todos for a project with no associated todos
-    Given A valid project exists which has no todos assigned (Alternate Flow)
+  Scenario: Viewing todos for a project with no associated todos (Alternate Flow)
+    Given A valid project exists which has no todos assigned
     When the student requests the list of todos for the project
     Then the system should return an empty list
     And the response status should be 200
