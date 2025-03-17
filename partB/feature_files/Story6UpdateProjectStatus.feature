@@ -25,5 +25,5 @@ Feature: Update Project Status
   Scenario: Error when project ID does not exist (Error Flow)
     Given the student has selected a non-existent project with projectId "-1"
     When the student attempts to update the project with projectId "-1" to set completed status to "true"
-    Then the system should return an error message "Invalid GUID for -1 entity project"
+    Then the system should return this "Invalid GUID for -1 entity project"
     And the response status should be a 404
