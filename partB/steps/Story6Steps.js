@@ -31,7 +31,6 @@ When('the student updates the valid project using its id to set completed status
     response = await request(baseUrl)
       .put(`/projects/${projectId}`)
       .send({ completed: completedStatus === "true" });
-    projectsToDelete.push(response.body.id)
     returnCode = response.status;
 });
 
@@ -57,7 +56,6 @@ When('the student updates the valid project using its id with the following attr
         active: attributes.active === "true",
         description: attributes.description
       });
-    projectsToDelete.push(response.body.id)
     returnCode = response.status;
 });
 
@@ -96,7 +94,6 @@ When('the student attempts to update the project with projectId {string} to set 
       .send({ completed: completedStatus === "true" });
 
     returnCode = response.status;
-    projectsToDelete.push(response.body.id)
     if (response.body.errorMessages) {
       errorMessage = response.body.errorMessages[0];
     }
@@ -109,7 +106,8 @@ Then
 
 After( async function() {
 
-     for (const id of projectsToDelete){
-      request(baseUrl).delete(`/projects/${id}`);
-      }
+       for (const id of projectsToDelete) {
+
+           await request(baseUrl).delete(`/projects/${id}`);
+         }
 });

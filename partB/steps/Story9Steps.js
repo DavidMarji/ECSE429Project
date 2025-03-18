@@ -3,7 +3,7 @@ const assert = require('assert');
 const request = require('supertest');
 
 const baseUrl = 'http://localhost:4567';
-
+const projectsToDelete = [];
 let response;
 let projectId;
 let initialProjectCount;
@@ -32,7 +32,7 @@ When('the student creates a new project with the following details:', async func
   });
 
   response = await request(baseUrl).post('/projects').send(projectData);
-
+  projectsToDelete.push(response.body.id);
   if (response.body && response.body.id) {
     projectId = response.body.id;
   }
@@ -61,7 +61,7 @@ When('the student creates a new project with only the required title:', async fu
   });
 
   response = await request(baseUrl).post('/projects').send(projectData);
-
+  projectsToDelete.push(response.body.id);
   if (response.body && response.body.id) {
     projectId = response.body.id;
   }
@@ -100,6 +100,7 @@ When('the student attempts to create a new project with id in request body', asy
   };
 
   response = await request(baseUrl).post('/projects').send(invalidData);
+  projectsToDelete.push(response.body.id)
 });
 
 Then('the system should {string}', function(expectedMessage) {
@@ -117,8 +118,8 @@ Then('no new project should be created in the system', async function() {
 });
 
 After( async function() {
-  if (projectId) {
-    await request(baseUrl).delete(`/projects/${projectId}`);
-    projectId = null;
-  }
+    for (const id of projectsToDelete) {
+
+        await request(baseUrl).delete(`/projects/${id}`);
+      }
 });

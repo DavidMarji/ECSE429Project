@@ -3,7 +3,7 @@ const assert = require('assert');
 const request = require('supertest');
 
 const baseUrl = 'http://localhost:4567';
-
+const projectsToDelete = [];
 let response;
 let returnCode;
 let projectsWithTasks = [];
@@ -32,7 +32,7 @@ Given('Multiple projects exist in the system with varying details and associated
     const projectRes = await request(baseUrl).post('/projects').send(data);
     assert.strictEqual(projectRes.status, 201);
     const project = projectRes.body;
-
+    projectsToDelete.push(projectRes.body.id);
     const task1 = await request(baseUrl).post('/todos').send({
       title: `Task 1 for ${data.title}`,
       description: "First subtask",
@@ -45,9 +45,10 @@ Given('Multiple projects exist in the system with varying details and associated
       doneStatus: true
     });
 
-    await request(baseUrl).post(`/projects/${project.id}/tasks`).send({"id": task1.body.id});
-    await request(baseUrl).post(`/projects/${project.id}/tasks`).send({"id": task2.body.id});
-
+    req1=await request(baseUrl).post(`/projects/${project.id}/tasks`).send({"id": task1.body.id});
+    projectsToDelete.push(req1.body.id);
+    req2 = await request(baseUrl).post(`/projects/${project.id}/tasks`).send({"id": task2.body.id});
+    projectsToDelete.push(req2.body.id);
     projectsWithTasks.push({
       project: project,
       tasks: [task1.body, task2.body]
@@ -64,6 +65,7 @@ Given('A valid project exists which has no tasks assigned', async function() {
   });
 
   assert.strictEqual(projectRes.status, 201);
+  projectsToDelete.push(projectRes.body.id);
   projectWithoutTasks = projectRes.body;
 });
 
@@ -160,14 +162,9 @@ Then('the response status should include {int}', function(expectedStatus) {
 });
 
 After( async function() {
-  for (const projectWithTask of projectsWithTasks) {
-    for (const task of projectWithTask.tasks) {
-      await request(baseUrl).delete(`/todos/${task.id}`);
-    }
-    await request(baseUrl).delete(`/projects/${projectWithTask.project.id}`);
-  }
+   for (const id of projectsToDelete) {
 
-  if (projectWithoutTasks) {
-    await request(baseUrl).delete(`/projects/${projectWithoutTasks.id}`);
-  }
+        await request(baseUrl).delete(`/projects/${id}`);
+      }
+
 });

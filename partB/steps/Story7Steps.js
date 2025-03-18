@@ -7,7 +7,8 @@ const baseUrl = 'http://localhost:4567';
 let response;
 let returnCode;
 let projects = [];
-
+const projectsToDelete = [
+  ];
 Given('Multiple projects exist in the system with varying statuses and titles', async function() {
   const projectData = [
     { title: "Math Assignment", completed: false, active: true },
@@ -22,6 +23,7 @@ Given('Multiple projects exist in the system with varying statuses and titles', 
     const res = await request(baseUrl).post('/projects').send(data);
     assert.strictEqual(res.status, 201);
     projects.push(res.body);
+    projectsToDelete.push(res.body.id);
   }
 });
 
@@ -127,7 +129,7 @@ Then('the response status should say {int}', function(expectedStatus) {
 });
 
 After( async function() {
-  for (const project of projects) {
-    await request(baseUrl).delete(`/projects/${project.id}`);
+  for (const id of projectsToDelete) {
+    await request(baseUrl).delete(`/projects/${id}`);
   }
 });
