@@ -1,4 +1,4 @@
-const { Given, When, Then } = require('@cucumber/cucumber');
+const { Given, When, Then, After } = require('@cucumber/cucumber');
 const assert = require('assert');
 const request = require('supertest');
 
@@ -159,7 +159,7 @@ Then('the response status should include {int}', function(expectedStatus) {
   assert.strictEqual(returnCode, expectedStatus);
 });
 
-Then('the projects and tasks should be deleted', async function() {
+After( async function() {
   for (const projectWithTask of projectsWithTasks) {
     for (const task of projectWithTask.tasks) {
       await request(baseUrl).delete(`/todos/${task.id}`);

@@ -1,4 +1,4 @@
-const { Given, When, Then } = require('@cucumber/cucumber');
+const { Given, When, Then, After } = require('@cucumber/cucumber');
 const assert = require('assert');
 const request = require('supertest');
 
@@ -116,7 +116,7 @@ Then('no new project should be created in the system', async function() {
     'The total number of projects should not have changed');
 });
 
-Then('the created project should be deleted if it exists', async function() {
+After( async function() {
   if (projectId) {
     await request(baseUrl).delete(`/projects/${projectId}`);
     projectId = null;

@@ -1,4 +1,4 @@
-const { Given, When, Then } = require('@cucumber/cucumber');
+const { Given, When, Then, After } = require('@cucumber/cucumber');
 const assert = require('assert');
 const request = require('supertest');
 
@@ -208,7 +208,7 @@ Then('no changes should be made to the system', async function() {
   }
 });
 
-Then('cleanup projects and tasks created for testing', async function() {
+After( async function() {
   for (const taskId of taskIdsBeforeDeletion) {
     await request(baseUrl).delete(`/todos/${taskId}`);
   }

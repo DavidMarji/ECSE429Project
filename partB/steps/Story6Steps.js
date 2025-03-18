@@ -1,4 +1,4 @@
-const { Given, When, Then } = require('@cucumber/cucumber');
+const { Given, When, Then, After } = require('@cucumber/cucumber');
 const assert = require('assert');
 const request = require('supertest');
 
@@ -104,7 +104,7 @@ Then('the system should return this {string}', function(expectedMessage) {
 });
 Then
 
-Then('the project should be deleted', async function() {
+After( async function() {
   if (projectId && projectId !== "-1") {
     await request(baseUrl).delete(`/projects/${projectId}`);
   }

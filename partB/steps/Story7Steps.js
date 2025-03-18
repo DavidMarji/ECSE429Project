@@ -1,4 +1,4 @@
-const { Given, When, Then } = require('@cucumber/cucumber');
+const { Given, When, Then, After } = require('@cucumber/cucumber');
 const assert = require('assert');
 const request = require('supertest');
 
@@ -126,7 +126,7 @@ Then('the response status should say {int}', function(expectedStatus) {
   }
 });
 
-Then('all created test projects should be deleted', async function() {
+After( async function() {
   for (const project of projects) {
     await request(baseUrl).delete(`/projects/${project.id}`);
   }
