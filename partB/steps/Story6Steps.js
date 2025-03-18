@@ -9,7 +9,8 @@ let projectId;
 let validProject;
 let returnCode;
 let errorMessage;
-
+const projectsToDelete = [
+  ];
 Given('A valid project exists in the system', async function() {
 
   const res = await request(baseUrl).post('/projects').send({
@@ -19,6 +20,7 @@ Given('A valid project exists in the system', async function() {
   });
 
   assert.strictEqual(res.status, 201);
+  projectsToDelete.push(res.body.id);
   validProject = res.body;
   projectId = validProject.id;
 });
@@ -105,9 +107,8 @@ Then('the system should return this {string}', function(expectedMessage) {
 Then
 
 After( async function() {
-  if (projectId && projectId !== "-1") {
-    await request(baseUrl).delete(`/projects/${projectId}`);
-  }
 
-      request(baseUrl).delete(`/projects/${projectId}`);
+     for (const id of projectsToDelete){
+      request(baseUrl).delete(`/projects/${id}`);
+      }
 });

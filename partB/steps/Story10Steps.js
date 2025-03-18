@@ -114,6 +114,7 @@ Given('some of these tasks are also associated with other projects', async funct
   });
 
   assert.strictEqual(otherProjectRes.status, 201);
+  projectsToDelete.push(otherProjectRes.body.id);
   const otherProject = otherProjectRes.body;
 
   for (let i = 0; i < 2; i++) {
