@@ -10,26 +10,29 @@ let taskIdsBeforeDeletion = [];
 let taskAssociations = {};
 let errorMessage;
 let allProjectsBeforeDeletion = [];
-
-Given('Multiple projects exist in the system including some that are no longer needed', async function() {
-  const projectData = [
-    {
-      title: "Old Project 1",
-      description: "This project is no longer needed",
-      completed: true,
-      active: false
-    },
-    {
-      title: "Active Project",
-      description: "This is an active project",
-      completed: false,
-      active: true
-    }
+const projectsToDelete = [
   ];
+Given('Multiple projects exist in the system including some that are no longer needed', async function() {
 
+  const projectData = [
+      {
+        title: "Old Project 1",
+        description: "This project is no longer needed",
+        completed: true,
+        active: false
+      },
+      {
+        title: "Active Project",
+        description: "This is an active project",
+        completed: false,
+        active: true
+      }
+    ];
   for (const data of projectData) {
     const res = await request(baseUrl).post('/projects').send(data);
+    console.log(res.body.errorMessages)
     assert.strictEqual(res.status, 201);
+    projectsToDelete.push(res.body.id)
   }
 
   const projectsRes = await request(baseUrl).get('/projects');
@@ -46,8 +49,8 @@ Given('A valid project exists which the student wants to delete', async function
     completed: false,
     active: true
   });
-
   assert.strictEqual(projectRes.status, 201);
+  projectsToDelete.push(projectRes.body.id)
   projectToDelete = projectRes.body;
 });
 
@@ -77,6 +80,7 @@ Given('A valid project exists with multiple tasks associated with it', async fun
   });
 
   assert.strictEqual(projectRes.status, 201);
+  projectsToDelete.push(projectRes.body.id)
   projectToDelete = projectRes.body;
 
   for (let i = 0; i < 3; i++) {
@@ -88,12 +92,13 @@ Given('A valid project exists with multiple tasks associated with it', async fun
 
     assert.strictEqual(taskRes.status, 201);
 
+
     const associationRes = await request(baseUrl)
       .post(`/projects/${projectToDelete.id}/tasks`)
       .send({"id": taskRes.body.id});
 
     assert.strictEqual(associationRes.status, 201);
-
+    projectsToDelete.push(associationRes.body.id)
     taskIdsBeforeDeletion.push(taskRes.body.id);
 
     taskAssociations[taskRes.body.id] = [projectToDelete.id];
@@ -213,15 +218,10 @@ After( async function() {
     await request(baseUrl).delete(`/todos/${taskId}`);
   }
 
-  const projectsRes = await request(baseUrl).get('/projects');
-  const projects = projectsRes.body.projects;
 
-  for (const project of projects) {
-    if (project.title.includes('Project to Delete') ||
-        project.title.includes('Project with Tasks') ||
-        project.title.includes('Other Project') ||
-        project.title.includes('Old Project')) {
-      await request(baseUrl).delete(`/projects/${project.id}`);
+  for (const id of projectsToDelete) {
+
+      await request(baseUrl).delete(`/projects/${id}`);
     }
-  }
+
 });
