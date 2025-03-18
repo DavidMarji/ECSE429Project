@@ -10,13 +10,16 @@ let resSaved = undefined;
 let project1 = undefined;
 
 After(async () => {
-   todo1 = undefined;
-   resSaved = undefined;
+    if(todo1)
+        await request(baseUrl).delete(`/todos/${todo1.id}`);
 
-   if(project1)
-    await request(baseUrl).delete(`/projects/${project1.id}`);
+    todo1 = undefined;
+    resSaved = undefined;
 
-   project1 = undefined;
+    if(project1)
+        await request(baseUrl).delete(`/projects/${project1.id}`);
+
+    project1 = undefined;
 });
 
 Given('the server is running', async () => {
@@ -26,7 +29,7 @@ Given('the server is running', async () => {
 Given("a valid todo exists with doneStatus {string}", async (string) => {
     const res = await request(baseUrl).post("/todos").send({
         "title" : "example todo1",
-        "doneStatus" : string === "true"
+        "doneStatus" : string === "true",
     });
 
     assert.strictEqual(res.status, 201);
@@ -64,7 +67,7 @@ Given("a todo is assigned to a project", async () => {
     assert.notStrictEqual(todoRes.body, undefined);
     todo1 = todoRes.body;
 
-    const projectRes = await request(baseUrl).post('/projects');
+    const projectRes = await request(baseUrl).post('/projects').send({"title" : "example title story 2 a todo is assinged to a project"});
     assert.strictEqual(projectRes.status, 201);
     assert.notStrictEqual(projectRes.body, undefined);
     project1 = projectRes.body;

@@ -34,13 +34,13 @@ Given('The server is running', async () => {
 });
 
 Given('A valid project exists which has valid todos associated with it', async () => {
-    const res = await request(baseUrl).post('/projects');
+    const res = await request(baseUrl).post('/projects').send({"title" : "example title story 3 a valid exists which has"});
 
     assert.strictEqual(res.status, 201);
     project1 = res.body;
 
     const todo1Res = await request(baseUrl).post('/todos').send({
-        title: "example todo1"
+        title: "example todo1",
     });
     const todo2Res = await request(baseUrl).post('/todos').send({
         title: "example todo2"
@@ -105,7 +105,7 @@ Then('the response status should be 200', async () => {
 });
 
 Given('A valid project exists which has no todos assigned', async () => {
-    const res = await request(baseUrl).post('/projects');
+    const res = await request(baseUrl).post('/projects').send({"title" : "example title story 1 a valid"});
 
     assert.strictEqual(res.status, 201);
     project2 = res.body;

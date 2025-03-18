@@ -30,7 +30,6 @@ Given('Multiple projects exist in the system including some that are no longer n
     ];
   for (const data of projectData) {
     const res = await request(baseUrl).post('/projects').send(data);
-    console.log(res.body.errorMessages)
     assert.strictEqual(res.status, 201);
     projectsToDelete.push(res.body.id)
   }
