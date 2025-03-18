@@ -3,7 +3,7 @@ const assert = require('assert');
 const request = require('supertest');
 
 const baseUrl = 'http://localhost:4567';
-
+const todosToDelete =[];
 let response;
 let projectToDelete;
 let taskIdsBeforeDeletion = [];
@@ -89,6 +89,7 @@ Given('A valid project exists with multiple tasks associated with it', async fun
       description: `This is task ${i + 1}`,
       doneStatus: false
     });
+   todosToDelete.push(taskRes.body.id);
 
     assert.strictEqual(taskRes.status, 201);
 
@@ -215,8 +216,8 @@ Then('no changes should be made to the system', async function() {
 });
 
 After( async function() {
-  for (const taskId of taskIdsBeforeDeletion) {
-    await request(baseUrl).delete(`/todos/${taskId}`);
+  for (const id of  todosToDelete) {
+    await request(baseUrl).delete(`/todos/${id}`);
   }
 
 

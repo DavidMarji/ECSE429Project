@@ -4,6 +4,7 @@ const request = require('supertest');
 
 const baseUrl = 'http://localhost:4567';
 const projectsToDelete = [];
+const todosToDelete = [];
 let response;
 let returnCode;
 let projectsWithTasks = [];
@@ -38,12 +39,15 @@ Given('Multiple projects exist in the system with varying details and associated
       description: "First subtask",
       doneStatus: false
     });
+    todosToDelete.push(task1.body.id);
 
     const task2 = await request(baseUrl).post('/todos').send({
       title: `Task 2 for ${data.title}`,
       description: "Second subtask",
       doneStatus: true
     });
+    todosToDelete.push(task2.body.id);
+
 
     req1=await request(baseUrl).post(`/projects/${project.id}/tasks`).send({"id": task1.body.id});
     projectsToDelete.push(req1.body.id);
@@ -166,5 +170,9 @@ After( async function() {
 
         await request(baseUrl).delete(`/projects/${id}`);
       }
+       for (const id of todosToDelete) {
+
+              await request(baseUrl).delete(`/todos/${id}`);
+            }
 
 });
