@@ -12,7 +12,7 @@ Feature: Create New Project
       | title                | description                              | active | completed
       | "Group Assignment 1" | "Research paper on renewable energy"     | true   | false
     Then a new project should be created in the system
-    And the response status should be 201
+    And the response an 201
 
 
   # Alternate Flow
@@ -21,12 +21,12 @@ Feature: Create New Project
       | title                |
       | "Individual Project" |
     Then a new project should be created with default values for optional fields
-    And the response status should be 201
+    And the response message includes 201
     And the system should return the newly created project details including an assigned id
 
   # Error Flow
   Scenario: Error when creating a project with id in request body (Error Flow)
     When the student attempts to create a new project with id in request body
-    Then the system should return an error message "Invalid Creation: Failed Validation: Not allowed to create with id"
-    And the response status should be 400
+    Then the system should "Invalid Creation: Failed Validation: Not allowed to create with id"
+    And the response status implies 400
     And no new project should be created in the system
