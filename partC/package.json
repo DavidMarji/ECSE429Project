@@ -1,0 +1,16 @@
+{
+  "name": "partc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "jex": "^0.1.7",
+    "node-os-utils": "^1.3.7",
+    "perf_hooks": "^0.0.1"
+  }
+}
