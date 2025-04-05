@@ -19,22 +19,6 @@ const checkServer = async () => {
     }
 };
 
-const deleteAllTodos = async () => {
-    try {
-        const allTodos = (await request(baseUrl).get('/todos')).body.todos;
-        for (const todo of allTodos) {
-            await request(baseUrl).delete(`/todos/${todo.id}`);
-        }
-    } catch (error) {
-        throw new Error("Something went wrong in deleting all todos before the test. " + error.message);
-    }
-};
-
-test.before(async () => {
-    await checkServer();
-    await deleteAllTodos();
-});
-
 const to_test_for = [
     1, 5, 10, 50, 75,
     100, 200, 300, 400, 500, 600, 700, 800, 900,
@@ -97,8 +81,29 @@ test('Performance test for todo create and update', async () => {
 
 });
 
-test.after(async () => {
-    await deleteAllTodos();
+test('Performance test for todo delete', async () => {
+    const filePath = path.join(__dirname, '../results/todo_delete.csv');
+    const deleteLines = ['NumberOfObjects,TransactionTime(ms),MemoryUse(mb),CpuUse'];
+
+    const res = (await request (baseUrl).get('/todos'));
+    const todoList = res.body.todos;
+ 
+    for (let i = todoList.length - 1; i >= 0; i--) {
+        const start = performance.now();
+        const todo = await request(baseUrl).delete(`/todos/${todoList[i].id}`);
+        const end = performance.now();
+        
+        assert.is(todo.status, 200)
+
+        if(to_test_for.includes(i)) {
+            const time = end - start;
+            deleteLines.push(`${i},${time},${os.freemem()/(Math.pow(2, 20))},${await cpu.usage()}`);
+        }
+    }
+
+    fs.writeFileSync(filePath, deleteLines.join('\n'));
+
 });
+
 
 test.run();
