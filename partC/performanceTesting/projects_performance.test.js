@@ -12,7 +12,7 @@ const cpu = osu.cpu;
 
 const checkServer = async () => {
     try {
-        await request(baseUrl).get('/todos');
+        await request(baseUrl).get('/projects');
         return true;
     } catch (error) {
         throw new Error('Backend is not running. Please start the server.');
@@ -30,9 +30,9 @@ const to_test_for = [
     10000, 11000, 12000, 13000, 14000, 15000
 ]
 
-test('Performance test for todo create and update', async () => {
-    const filePath = path.join(__dirname, '../results/todo_create.csv');
-    const updateFilePath = path.join(__dirname, '../results/todo_update.csv');
+test('Performance test for projects create and update', async () => {
+    const filePath = path.join(__dirname, '../results/project_create.csv');
+    const updateFilePath = path.join(__dirname, '../results/project_update.csv');
 
     const lines = new Array(1)
     lines[0] = 'NumberOfObjects,TransactionTime(ms),MemoryUse(mb),CpuUse';
@@ -42,16 +42,19 @@ test('Performance test for todo create and update', async () => {
     for (let i = 0; i <= 15000; i++) {
         const start = performance.now();
 
-        const todo = await request(baseUrl).post('/todos').send({
-            "title": `example title, ${i}`,
-            "doneStatus": i % 2 === 0,
-            "description": `${i}th todo created`
+        const project = await request(baseUrl).post('/projects').send({
+            "title": `example title project, ${i}`,
+            "completed": i % 2 === 0,
+            "active" : i%2 !==0,
+            "description": `${i}th project created`
         });
         const end = performance.now();
 
-        assert.is(todo.status, 201);
-        assert.is(todo.body.doneStatus, i % 2 === 0 ? "true" : "false");
-        assert.is(todo.body.description, `${i}th todo created`);
+        assert.is(project.status, 201);
+        assert.is(project.body.completed, i % 2 === 0 ? "true" : "false");
+        assert.is(project.body.title, `example title project, ${i}`);
+        assert.is(project.body.active, i % 2 !== 0 ? "true" : "false");
+        assert.is(project.body.description, `${i}th project created`);
 
         const time = end - start;
 
@@ -62,18 +65,20 @@ test('Performance test for todo create and update', async () => {
         if(to_test_for.includes(i)) {
             const start_update = performance.now();
 
-            const updateRes = await request(baseUrl).post(`/todos/${todo.body.id}`).send({
+            const updateRes = await request(baseUrl).post(`/projects/${project.body.id}`).send({
                 "title" : `new title, ${i}`,
-                "doneStatus": i % 2 !== 0,
-                "description": `${i}th todo is updated`
+                "completed": i % 2 !== 0,
+                "active" : i%2 ===0,
+                "description": `${i}th project updated`
             });
 
             const end_update = performance.now();
 
             assert.is(updateRes.status, 200);
-            assert.is(updateRes.body.id, todo.body.id);
-            assert.is(updateRes.body.doneStatus, i % 2 !== 0 ? "true" : "false");
-            assert.is(updateRes.body.description, `${i}th todo is updated`);
+            assert.is(updateRes.body.id, project.body.id);
+            assert.is(updateRes.body.completed, i % 2 !== 0 ? "true" : "false");
+            assert.is(updateRes.body.active, i % 2 === 0 ? "true" : "false");
+            assert.is(updateRes.body.description, `${i}th project updated`);
 
 
             updateLines.push(`${i},${end_update - start_update},${os.freemem()/(Math.pow(2, 20))},${await cpu.usage()}`)
@@ -85,19 +90,19 @@ test('Performance test for todo create and update', async () => {
 
 });
 
-test('Performance test for todo delete', async () => {
-    const filePath = path.join(__dirname, '../results/todo_delete.csv');
+test('Performance test for projects delete', async () => {
+    const filePath = path.join(__dirname, '../results/projects_delete.csv');
     const deleteLines = ['NumberOfObjects,TransactionTime(ms),MemoryUse(mb),CpuUse'];
 
-    const res = (await request (baseUrl).get('/todos'));
-    const todoList = res.body.todos;
+    const res = (await request (baseUrl).get('/projects'));
+    const projectList = res.body.projects;
  
-    for (let i = todoList.length - 1; i >= 0; i--) {
+    for (let i = projectList.length - 1; i >= 0; i--) {
         const start = performance.now();
-        const todo = await request(baseUrl).delete(`/todos/${todoList[i].id}`);
+        const project = await request(baseUrl).delete(`/projects/${projectList[i].id}`);
         const end = performance.now();
         
-        assert.is(todo.status, 200)
+        assert.is(project.status, 200)
 
         if(to_test_for.includes(i)) {
             const time = end - start;

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node performanceTesting/todos_performance.test.js"
+    "test": "uvu performanceTesting"
   },
   "author": "",
   "license": "ISC",
